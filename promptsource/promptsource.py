@@ -2,7 +2,6 @@ import datasets
 import streamlit as st
 from session import _get_state
 from templates import Template, TemplateCollection
-from utils import EnrichedDataset
 
 #
 # Helper functions for datasets library

@@ -94,7 +94,6 @@ class TemplateCollection:
         return count_dict
 
     def get_templates_count(self, dataset):
-        print(dataset)
         return len(self.templates[dataset]) if dataset in self.templates else 0
 
 
