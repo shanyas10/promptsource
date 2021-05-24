@@ -2,6 +2,7 @@ import datasets
 import streamlit as st
 from session import _get_state
 from templates import Template, TemplateCollection
+from utils import EnrichedDataset
 
 #
 # Helper functions for datasets library
@@ -66,6 +67,7 @@ def reset_template_state():
 #
 state = _get_state()
 
+
 #
 # Initial page setup
 #
@@ -86,6 +88,9 @@ except FileNotFoundError:
     )
     st.stop()
 
+#
+# Fetches template:count dictionary
+count_dict  = templates.get_templates_count_dict()
 
 def save_data(message="Done!"):
     with open("./templates.yaml", "w") as f:
@@ -96,7 +101,6 @@ def save_data(message="Done!"):
 #
 def list_datasets(option):
     dataset_list = datasets.list_datasets(with_community_datasets=False)
-    count_dict  = templates.get_templates_count()
     if(option):
         dataset_list = list(set(dataset_list) - set(list(d for d in count_dict if count_dict[d]>2))) 
         dataset_list.sort() 
@@ -108,11 +112,13 @@ dataset_list = list_datasets(option)
 #
 # Select a dataset
 #
+
 dataset_key = st.sidebar.selectbox(
     "Dataset",
     dataset_list,
     key="dataset_select",
     help="Select the dataset to work on. Number in parens " + "is the number of prompts created.",
+    format_func=lambda a: a+" ("+(str(count_dict[a]) if a in count_dict else "0")+")"
 )
 st.sidebar.write("HINT: Try ag_news or trec for examples.")
 
@@ -129,9 +135,10 @@ if dataset_key is not None:
     conf_option = None
     if conf_avail:
         start = 0
-        conf_option = st.sidebar.selectbox("Subset", configs, index=start, format_func=lambda a: a.name)
+        conf_option = st.sidebar.selectbox("Subset", configs, index=start, format_func = lambda a: \
+            a.name + " ("+str(templates.get_templates_count((dataset_key, a.name)))+")")
 
-    dataset, _ = get_dataset(dataset_key, str(conf_option.name) if conf_option else None)
+    dataset, _ = get_dataset(dataset_key, conf_option.name if conf_option else None)
 
     k = list(dataset.keys())
     index = 0

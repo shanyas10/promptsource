@@ -82,7 +82,7 @@ class TemplateCollection:
             return {}
         return self.templates[dataset].copy()
     
-    def get_templates_count(self):
+    def get_templates_count_dict(self):
         count_dict = {}
         for k,v in self.templates.items():
             if isinstance(k, str):
@@ -92,6 +92,10 @@ class TemplateCollection:
         for dataset, group in groups:
             count_dict[dataset] = sum(len(self.templates[conf]) for conf in group)
         return count_dict
+
+    def get_templates_count(self, dataset):
+        print(dataset)
+        return len(self.templates[dataset]) if dataset in self.templates else 0
 
 
     def __len__(self):
